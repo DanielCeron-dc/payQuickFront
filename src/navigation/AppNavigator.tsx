@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from '../screens/Home/HomeScreen';
 import { COLORS } from '../constants/theme';
 import CheckoutScreen from '../screens/Checkout/CheckoutScreen';
+import SplashScreen from '../screens/Splash/Splash';
 
 
 
@@ -22,8 +23,7 @@ const AppNavigator = () => {
     return (
         <NavigationContainer>
             <Stack.Navigator
-                initialRouteName="Home"
-                
+                initialRouteName="Splash"
                 screenOptions={{
                     headerStyle: {
                         backgroundColor: COLORS.primary,
@@ -33,7 +33,15 @@ const AppNavigator = () => {
                         fontWeight: '600',
                     },
                 }}>
-         
+
+                    <Stack.Screen
+                        name="Splash"
+                        component={SplashScreen}
+                        options={{
+                            headerShown: false,
+                        }}
+                    />
+
                 <Stack.Screen
                     name="Home"
                     component={HomeScreen}
