@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // Screens
 import HomeScreen from '../screens/Home/HomeScreen';
 import { COLORS } from '../constants/theme';
+import CheckoutScreen from '../screens/Checkout/CheckoutScreen';
 
 
 
@@ -39,6 +40,14 @@ const AppNavigator = () => {
                     options={{
                         title: 'PayQuick Store',
                         headerBackVisible: false,
+                    }}
+                />
+
+                <Stack.Screen
+                    name="Checkout"
+                    component={CheckoutScreen}
+                    options={{
+                        title: 'Checkout',
                     }}
                 />
             </Stack.Navigator>
