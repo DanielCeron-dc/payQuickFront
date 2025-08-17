@@ -1,17 +1,10 @@
-import React, { Component, ReactNode, useEffect } from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  StatusBar,
-} from 'react-native';
+import React, { Component, ReactNode } from 'react';
 import { Provider } from 'react-redux';
 import { store } from './src/store';
 import AppNavigator from './src/navigation/AppNavigator';
 import Toast from 'react-native-toast-message';
-import { secureRetrieve } from './src/utils/encryption';
-import { loadCart } from './src/store/cartSlice';
-import { loadSecureTransaction } from './src/store/paymentSlice';
+import { useAppInitialization } from './src/hooks/useAppInitialization';
+import ErrorScreen from './src/components/common/ErrorScreen';
 
 
 // --- Types ---
@@ -36,24 +29,17 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    // You can send this to a crash reporting service
-    // eslint-disable-next-line no-console
     console.error('ErrorBoundary caught an error:', error, errorInfo);
   }
 
   render(): ReactNode {
     if (this.state.hasError) {
       return (
-        <View style={styles.errorContainer}>
-          <StatusBar barStyle="light-content" backgroundColor="#ef4444" />
-          <Text style={styles.errorTitle}>Oops! Something went wrong</Text>
-          <Text style={styles.errorMessage}>
-            The app encountered an unexpected error. Please restart the app.
-          </Text>
-          <Text style={styles.errorDetails}>
-            {this.state.error?.message || 'Unknown error'}
-          </Text>
-        </View>
+        <ErrorScreen
+          title="App Crashed"
+          message="The app encountered an unexpected error. Please restart the app."
+          error={this.state.error?.message || 'Unknown error'}
+        />
       );
     }
 
@@ -62,28 +48,9 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
 }
 
 const AppLoader: React.FC = () => {
+  useAppInitialization();
 
-  useEffect(() => {
-    void initializeSecureData();
-  }, []);
-
-  const initializeSecureData = async (): Promise<void> => {
-    try {
-      const savedCart: unknown = await secureRetrieve('cart');
-      if (savedCart != null) {
-        store.dispatch(loadCart(savedCart as any));
-      }
-
-      const savedTransaction: unknown = await secureRetrieve('lastTransaction');
-      if (savedTransaction != null) {
-        store.dispatch(loadSecureTransaction(savedTransaction as any));
-      }
-    } catch (error) {
-      console.error('Error loading secure data:', error);
-    }
-  };
-
-
+  // App is ready to use
   return (
     <>
       <AppNavigator />
@@ -103,34 +70,5 @@ const App: React.FC = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  errorContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fee2e2',
-    padding: 20,
-  },
-  errorTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#dc2626',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  errorMessage: {
-    fontSize: 16,
-    color: '#7f1d1d',
-    textAlign: 'center',
-    marginBottom: 16,
-    lineHeight: 24,
-  },
-  errorDetails: {
-    fontSize: 12,
-    color: '#991b1b',
-    textAlign: 'center',
-    fontFamily: 'monospace',
-  },
-});
 
 export default App;
