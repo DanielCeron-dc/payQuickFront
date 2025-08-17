@@ -7,10 +7,8 @@ import {
 } from 'react-native';
 import { Provider } from 'react-redux';
 import { store } from './src/store';
-
+import AppNavigator from './src/navigation/AppNavigator';
 import Toast from 'react-native-toast-message';
-
-import { loadCart } from './src/store/cartSlice';
 
 
 // --- Types ---
@@ -60,26 +58,26 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 }
 
+// App Loader Component
+const AppLoader: React.FC = () => {
 
 
-import { Button } from 'react-native';
 
+
+  return (
+    <>
+      <AppNavigator />
+      <Toast />
+    </>
+  );
+};
+
+// Main App Component
 const App: React.FC = () => {
-  const showToast = () => {
-    Toast.show({
-      type: 'success',
-      text1: 'Hello!',
-      text2: 'This is a test toast message.'
-    });
-  };
   return (
     <Provider store={store}>
       <ErrorBoundary>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <Text>Welcome to PayQuick!</Text>
-          <Button title="Show Toast" onPress={showToast} />
-          <Toast />
-        </View>
+        <AppLoader />
       </ErrorBoundary>
     </Provider>
   );
