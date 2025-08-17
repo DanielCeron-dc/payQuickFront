@@ -22,12 +22,12 @@ export interface ICartItem {
     quantity: number;
 }
 
-export interface CartState {
+export interface ICartState {
     items: ICartItem[];
     total: number;
 }
 
-const initialState: CartState = {
+const initialState: ICartState = {
     items: [],
     total: 0,
 };
@@ -73,7 +73,7 @@ const cartSlice = createSlice({
             state.total = 0;
             void AsyncStorage.setItem('cart', JSON.stringify(state));
         },
-        loadCart: (state, action: PayloadAction<CartState>) => {
+        loadCart: (state, action: PayloadAction<ICartState>) => {
             state.items = action.payload.items || [];
             state.total = action.payload.total || 0;
         },
