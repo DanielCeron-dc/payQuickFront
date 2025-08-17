@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
-export interface Product {
+export interface IProduct {
   id: string;
   name: string;
   price: number;
@@ -18,7 +18,7 @@ export interface Product {
 // ---- Types ----
 export interface ICartItem {
   id: string;
-  product: Product;
+  product: IProduct;
   quantity: number;
 }
 
