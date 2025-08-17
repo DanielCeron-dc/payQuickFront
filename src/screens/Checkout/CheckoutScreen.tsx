@@ -8,21 +8,23 @@ import {
 
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSelector, useDispatch } from 'react-redux';
+import Modal from 'react-native-modal';
 import Toast from 'react-native-toast-message';
 import type { ListRenderItem } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
+import CartItem from '../../components/product/CartItem';
 import Button from '../../components/common/Button';
+import PaymentModal from '../../components/payment/PaymentModal';
 import { ICartItem, clearCart } from '../../store/cartSlice';
-import { processPayment } from '../../services/paymentApi';
+import { processPayment } from '../../services/paymentAPI';
 import { startProcessing, processPaymentSuccess, processPaymentFailure } from '../../store/paymentSlice';
 
 import { COLORS, FONTS, SIZES, SPACING, BORDER_RADIUS, SHADOW } from '../../constants/theme';
 import { getResponsiveDimensions } from '../../utils/responsive';
-import CartItem from '../../components/product/CartItem';
+import { AppDispatch } from '../../store';
 
-// ---- Types you likely already have elsewhere; swap with real imports if available ----
-type AppDispatch = any; // replace with: export type AppDispatch = typeof store.dispatch
+
 type Step = 'card' | 'summary';
 
 export interface CartItemModel {
@@ -199,6 +201,25 @@ const CheckoutScreen: React.FC<Props> = ({ navigation }) => {
                 }
             />
 
+            <Modal
+                isVisible={paymentModalVisible}
+                onBackdropPress={() => setPaymentModalVisible(false)}
+                onSwipeComplete={() => setPaymentModalVisible(false)}
+                swipeDirection="down"
+                style={styles.modal}
+                backdropOpacity={0.7}
+                animationIn="slideInUp"
+                animationOut="slideOutDown"
+            >
+                <PaymentModal
+                    step={paymentStep}
+                    total={finalTotal}
+                    onClose={() => setPaymentModalVisible(false)}
+                    onPaymentSuccess={handlePaymentSuccess}
+                    onStepChange={setPaymentStep}
+                    loading={payment?.isProcessing}
+                />
+            </Modal>
 
             <Toast />
         </SafeAreaView>

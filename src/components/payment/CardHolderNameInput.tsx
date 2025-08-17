@@ -1,34 +1,29 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { COLORS, FONTS, SIZES, SPACING, BORDER_RADIUS } from '../../constants/theme';
-import { validateCVV } from '../../utils/creditCard';
-import { ICardType } from '../../store/paymentSlice';
-
+import { validateHolderName } from '../../utils/creditCard';
 
 type Props = {
     value: string;
-    onChange: (cvv: string) => void;
-    cardType?: ICardType;
+    onChange: (holderName: string) => void;
     error?: string | null;
     label?: string;
     placeholder?: string;
     testID?: string;
 };
 
-const CvvInput: React.FC<Props> = ({
+const CardHolderNameInput: React.FC<Props> = ({
     value,
     onChange,
-    cardType = 'unknown',
     error,
-    label = 'CVV',
-    placeholder = '123',
+    label = 'Cardholder Name',
+    placeholder = 'John Doe',
     testID,
 }) => {
     const [focused, setFocused] = useState(false);
     const [touched, setTouched] = useState(false);
-    const maxLen = useMemo(() => (cardType === 'amex' ? 4 : 3), [cardType]);
-
-    const shouldShowError = validateCVV(value, cardType as any) === false && touched;
+    
+    const shouldShowError = validateHolderName(value) === false && touched;
 
     return (
         <View style={styles.container} testID={testID}>
@@ -36,21 +31,19 @@ const CvvInput: React.FC<Props> = ({
             <View style={[styles.inputWrap, focused && styles.inputFocused, shouldShowError && styles.inputError]}>
                 <TextInput
                     value={value}
-                    onChangeText={(t) => onChange(t.replace(/\D/g, '').slice(0, maxLen))}
+                    onChangeText={onChange}
                     onFocus={() => setFocused(true)}
                     onBlur={() => { setFocused(false); setTouched(true); }}
                     placeholder={placeholder}
-                    keyboardType="number-pad"
-                    maxLength={maxLen}
-                    secureTextEntry
+                    autoCapitalize="words"
                     style={styles.input}
-                    accessibilityLabel="CVV"
+                    accessibilityLabel="Cardholder name"
                     returnKeyType="next"
-                    autoComplete="cc-csc"
+                    autoComplete="cc-name"
                     importantForAutofill="yes"
                 />
             </View>
-            {shouldShowError && <Text style={styles.errorText}>{error || 'Invalid CVV'}</Text>}
+            {shouldShowError && <Text style={styles.errorText}>{error || 'Invalid cardholder name'}</Text>}
         </View>
     );
 };
@@ -59,8 +52,12 @@ const styles = StyleSheet.create({
     container: { marginBottom: SPACING.lg },
     label: { fontSize: SIZES.sm, fontWeight: FONTS.semibold as any, color: COLORS.text, marginBottom: SPACING.sm },
     inputWrap: {
-        flexDirection: 'row', alignItems: 'center',
-        borderWidth: 1, borderColor: COLORS.border, borderRadius: BORDER_RADIUS.md, backgroundColor: COLORS.surface,
+        flexDirection: 'row', 
+        alignItems: 'center',
+        borderWidth: 1, 
+        borderColor: COLORS.border, 
+        borderRadius: BORDER_RADIUS.md, 
+        backgroundColor: COLORS.surface,
     },
     input: { flex: 1, padding: SPACING.md, fontSize: SIZES.md, color: COLORS.text },
     inputFocused: { borderColor: COLORS.primary },
@@ -68,4 +65,4 @@ const styles = StyleSheet.create({
     errorText: { fontSize: SIZES.sm, color: COLORS.error, marginTop: SPACING.xs },
 });
 
-export default CvvInput;
+export default CardHolderNameInput;

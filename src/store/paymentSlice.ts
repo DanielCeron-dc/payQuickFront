@@ -3,9 +3,9 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { secureStore, securePaymentData, ICardInfoInput } from '../utils/encryption';
 import { ITransaction } from '../services/paymentApi';
 
-export type CardType = '' | 'visa' | 'mastercard' | 'amex';
+export type ICardType = '' | 'visa' | 'mastercard' | 'amex';
 
-export interface CardInfo {
+export interface ICardInfo {
     number: string;
     expiryDate: string; // MM/YY
     cvv: string;
@@ -14,8 +14,8 @@ export interface CardInfo {
 
 
 export interface PaymentState {
-    cardInfo: CardInfo;
-    cardType: CardType;
+    cardInfo: ICardInfo;
+    cardType: ICardType;
     isProcessing: boolean;
     lastTransaction: ITransaction | null;
     error: unknown | null;
@@ -38,10 +38,10 @@ const paymentSlice = createSlice({
     name: 'payment',
     initialState,
     reducers: {
-        updateCardInfo: (state, action: PayloadAction<Partial<CardInfo>>) => {
+        updateCardInfo: (state, action: PayloadAction<Partial<ICardInfo>>) => {
             state.cardInfo = { ...state.cardInfo, ...action.payload };
         },
-        setCardType: (state, action: PayloadAction<CardType>) => {
+        setCardType: (state, action: PayloadAction<ICardType>) => {
             state.cardType = action.payload;
         },
         startProcessing: (state) => {

@@ -22,7 +22,8 @@ const ExpiryInput: React.FC<Props> = ({
     testID,
 }) => {
     const [focused, setFocused] = useState(false);
-    const isInvalid = !!error || (value.length > 0 && !validateExpiryDate(value));
+    const [touched, setTouched] = useState(false);
+    const shouldShowError = validateExpiryDate(value) === false && touched;
 
     const handleChange = useCallback((text: string) => {
         // keep only digits, then add slash (MM/YY)
@@ -53,13 +54,13 @@ const ExpiryInput: React.FC<Props> = ({
     return (
         <View style={styles.container} testID={testID}>
             <Text style={styles.label}>{label}</Text>
-            <View style={[styles.inputWrap, focused && styles.inputFocused, isInvalid && styles.inputError]}>
+            <View style={[styles.inputWrap, focused && styles.inputFocused, shouldShowError && styles.inputError]}>
                 <TextInput
                     value={value}
                     onChangeText={handleChange}
                     onKeyPress={onKeyPress}
                     onFocus={() => setFocused(true)}
-                    onBlur={() => setFocused(false)}
+                    onBlur={() => { setFocused(false); setTouched(true); }}
                     placeholder={placeholder}
                     keyboardType="number-pad"
                     maxLength={5}
@@ -70,7 +71,7 @@ const ExpiryInput: React.FC<Props> = ({
                     importantForAutofill="yes"
                 />
             </View>
-            {isInvalid && <Text style={styles.errorText}>{error || 'Invalid expiry date'}</Text>}
+            {shouldShowError && <Text style={styles.errorText}>{error || 'Invalid expiry date'}</Text>}
         </View>
     );
 };
