@@ -9,6 +9,9 @@ import { Provider } from 'react-redux';
 import { store } from './src/store';
 import AppNavigator from './src/navigation/AppNavigator';
 import Toast from 'react-native-toast-message';
+import { secureRetrieve } from './src/utils/encryption';
+import { loadCart } from './src/store/cartSlice';
+import { loadSecureTransaction } from './src/store/paymentSlice';
 
 
 // --- Types ---
@@ -58,10 +61,27 @@ class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   }
 }
 
-// App Loader Component
 const AppLoader: React.FC = () => {
 
+  useEffect(() => {
+    void initializeSecureData();
+  }, []);
 
+  const initializeSecureData = async (): Promise<void> => {
+    try {
+      const savedCart: unknown = await secureRetrieve('cart');
+      if (savedCart != null) {
+        store.dispatch(loadCart(savedCart as any));
+      }
+
+      const savedTransaction: unknown = await secureRetrieve('lastTransaction');
+      if (savedTransaction != null) {
+        store.dispatch(loadSecureTransaction(savedTransaction as any));
+      }
+    } catch (error) {
+      console.error('Error loading secure data:', error);
+    }
+  };
 
 
   return (
