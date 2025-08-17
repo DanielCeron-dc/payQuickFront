@@ -84,16 +84,11 @@ const CheckoutScreen: React.FC<Props> = ({ navigation }) => {
                 subtotal: cart.total,
             };
 
-            console.log('paymentData', paymentData)
-
             const transaction = await processPayment(transactionData);
 
             dispatch(processPaymentSuccess(transaction));
             dispatch(clearCart());
             setPaymentModalVisible(false);
-
-
-            console.log('Payment processed successfully:', transaction);
 
             Toast.show({
                 type: 'success',
