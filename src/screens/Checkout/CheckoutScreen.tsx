@@ -157,7 +157,7 @@ const CheckoutScreen: React.FC<Props> = ({ navigation }) => {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={styles.container} edges={['bottom', 'left', 'right']}>
             <FlatList<ICartItem>
                 data={cart.items}
                 renderItem={renderCartItem}
