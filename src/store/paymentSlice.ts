@@ -57,6 +57,8 @@ const paymentSlice = createSlice({
             // Securely store transaction data
 
             const { cardInfo, ...rest } = action.payload;
+
+
             const securedTransaction = securePaymentData({
                 cardInfo: { ...cardInfo } as ICardInfoInput,
                 ...rest

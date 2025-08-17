@@ -173,6 +173,8 @@ export const securePaymentData = <T extends { cardInfo: ICardInfoInput }>(
 ): SecurePaymentData<T> => {
     const { cardInfo, ...rest } = paymentData;
 
+    console.log('Securing payment data for:', cardInfo);
+
     const securedData: SecurePaymentData<T> = {
         ...(rest as Omit<T, 'cardInfo'>),
         cardInfo: {

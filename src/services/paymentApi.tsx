@@ -13,9 +13,9 @@ export interface CartItemInput {
 }
 
 export interface CardInfoInput {
-    number: string;         //!  never store in prod)
-    expiryDate: string;     //! MM/YY
-    cvv: string;            //! mock only — never store in prod
+    number: string;         
+    expiryDate: string;    
+    cvv: string;            
     holderName: string;
     cardType?: CardType;
 }
@@ -118,7 +118,7 @@ export const processPayment = async (
         })),
         paymentMethod: {
             type: 'credit_card',
-            cardType: cardInfo.cardType ?? 'unknown',
+            cardType: cardInfo.cardType || 'unknown',
             last4: cardInfo.number.slice(-4),
         },
     };

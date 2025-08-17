@@ -17,14 +17,10 @@ import Button from '../../components/common/Button';
 import { MOCK_PRODUCTS } from '../../constants/mockData';
 import { COLORS, FONTS, SIZES, SPACING, BORDER_RADIUS, SHADOW } from '../../constants/theme';
 import { IProduct } from '../../store/cartSlice';
+import { IRootStackParamList } from '../../navigation/AppNavigator';
 
-// If you already define this in your navigator types, reuse that instead.
-type RootStackParamList = {
-    Home: undefined;
-    Checkout: undefined;
-};
 
-type Props = NativeStackScreenProps<RootStackParamList, 'Home'>;
+type Props = NativeStackScreenProps<IRootStackParamList, 'Home'>;
 
 
 // If your store exports RootState, import it and replace `any` below:

@@ -7,17 +7,18 @@ import HomeScreen from '../screens/Home/HomeScreen';
 import { COLORS } from '../constants/theme';
 import CheckoutScreen from '../screens/Checkout/CheckoutScreen';
 import SplashScreen from '../screens/Splash/Splash';
+import TransactionScreen from '../screens/Transaction/TransactionScreen';
 
 
 
-type RootStackParamList = {
+export type IRootStackParamList = {
     Splash: undefined;
     Home: undefined;
     Checkout: undefined;
     Transaction: undefined;
 };
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+const Stack = createNativeStackNavigator<IRootStackParamList>();
 
 const AppNavigator = () => {
     return (
@@ -56,6 +57,14 @@ const AppNavigator = () => {
                     component={CheckoutScreen}
                     options={{
                         title: 'Checkout',
+                    }}
+                />
+
+                <Stack.Screen
+                    name="Transaction"
+                    component={TransactionScreen}
+                    options={{
+                        title: 'Transaction',
                     }}
                 />
             </Stack.Navigator>

@@ -33,7 +33,7 @@ interface Props {
     step: Step;
     total: number;
     onClose?: () => void;
-    onPaymentSuccess: (cardInfo: ICardInfo) => void;
+    onPaymentSuccess: (cardInfo: ICardInfo, cardType: ICardType) => void;
     onStepChange: (next: Step) => void;
     loading?: boolean;
 }
@@ -78,7 +78,7 @@ const PaymentModal: React.FC<Props> = ({
         if (step === 'card' && isValid) {
             onStepChange('summary');
         } else if (step === 'summary') {
-            onPaymentSuccess(cardInfo);
+            onPaymentSuccess(cardInfo, cardType);
         }
     };
 
@@ -98,6 +98,8 @@ const PaymentModal: React.FC<Props> = ({
                     onChange={(formatted) => dispatch(updateCardInfo({ number: formatted }))}
                     onTypeChange={(t) => {
                         const supported = (['visa', 'mastercard', 'amex'] as const).includes(t as any) ? t : 'visa';
+
+                        console.log('Card type changed to:', supported);
                         dispatch(setCardType(supported as any));
                     }}
                 />

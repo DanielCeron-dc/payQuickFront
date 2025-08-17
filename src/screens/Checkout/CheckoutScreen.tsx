@@ -17,12 +17,13 @@ import CartItem from '../../components/product/CartItem';
 import Button from '../../components/common/Button';
 import PaymentModal from '../../components/payment/PaymentModal';
 import { ICartItem, clearCart } from '../../store/cartSlice';
-import { processPayment } from '../../services/paymentAPI';
-import { startProcessing, processPaymentSuccess, processPaymentFailure } from '../../store/paymentSlice';
+import { processPayment } from '../../services/paymentApi';
+import { startProcessing, processPaymentSuccess, processPaymentFailure, ICardType, ICardInfo } from '../../store/paymentSlice';
 
 import { COLORS, FONTS, SIZES, SPACING, BORDER_RADIUS, SHADOW } from '../../constants/theme';
 import { getResponsiveDimensions } from '../../utils/responsive';
-import { AppDispatch } from '../../store';
+import { AppDispatch, RootState } from '../../store';
+import { IRootStackParamList } from '../../navigation/AppNavigator';
 
 
 type Step = 'card' | 'summary';
@@ -43,27 +44,8 @@ type CartState = {
 
 type PaymentState = {
     isProcessing: boolean;
-    // other fields exist but aren't used here
 };
-
-type RootState = {
-    cart: CartState;
-    payment: PaymentState;
-};
-
-type RootStackParamList = {
-    Checkout: undefined;
-    Transaction: undefined;
-};
-
-type Props = NativeStackScreenProps<RootStackParamList, 'Checkout'>;
-
-export interface CardInfo {
-    number: string;
-    expiryDate: string; // MM/YY
-    cvv: string;
-    holderName: string;
-}
+type Props = NativeStackScreenProps<IRootStackParamList, 'Checkout'>;
 
 // ----------------------------------------------------------------------------
 
@@ -85,12 +67,12 @@ const CheckoutScreen: React.FC<Props> = ({ navigation }) => {
         setPaymentModalVisible(true);
     };
 
-    const handlePaymentSuccess = async (paymentData: CardInfo): Promise<void> => {
+    const handlePaymentSuccess = async (paymentData: ICardInfo, cardType: ICardType): Promise<void> => {
         try {
             dispatch(startProcessing());
 
             const transactionData = {
-                cardInfo: paymentData,
+                cardInfo: {...paymentData , cardType} as ICardInfo,
                 items: cart.items.map((item) => ({
                     id: item.id,
                     name: item.product.name,
