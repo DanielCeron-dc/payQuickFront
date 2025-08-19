@@ -20,6 +20,7 @@
     "@reduxjs/toolkit": "^2.8.2",
     "@testing-library/jest-native": "^5.4.3",
     "@testing-library/react-native": "^13.2.2",
+    "axios": "^1.11.0",
     "crypto-js": "^3.3.0",
     "jest-environment-node": "^30.0.5",
     "react": "19.1.0",
