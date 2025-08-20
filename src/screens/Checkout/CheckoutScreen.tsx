@@ -17,7 +17,6 @@ import CartItem from '../../components/product/CartItem';
 import Button from '../../components/common/Button';
 import PaymentModal from '../../components/payment/PaymentModal';
 import { ICartItem, clearCart } from '../../store/cartSlice';
-import { processPayment } from '../../services/paymentApi';
 import { startProcessing, processPaymentSuccess, processPaymentFailure, ICardType, ICardInfo } from '../../store/paymentSlice';
 
 import { COLORS, FONTS, SIZES, SPACING, BORDER_RADIUS, SHADOW } from '../../constants/theme';
@@ -25,6 +24,7 @@ import { getResponsiveDimensions } from '../../utils/responsive';
 import { AppDispatch, RootState } from '../../store';
 import { IRootStackParamList } from '../../navigation/AppNavigator';
 
+import { createTransaction, payTransaction, TransactionRequest } from '../../services/api'; // Import API functions
 
 type Step = 'card' | 'summary';
 
@@ -67,47 +67,81 @@ const CheckoutScreen: React.FC<Props> = ({ navigation }) => {
         setPaymentModalVisible(true);
     };
 
-    const handlePaymentSuccess = async (paymentData: ICardInfo, cardType: ICardType): Promise<void> => {
-        try {
-            dispatch(startProcessing());
+   const handlePaymentSuccess = async (paymentData: ICardInfo): Promise<void> => {
+    try {
+        dispatch(startProcessing());
 
-            const transactionData = {
-                cardInfo: {...paymentData , cardType} as ICardInfo,
-                items: cart.items.map((item) => ({
-                    id: item.id,
-                    name: item.product.name,
-                    price: item.product.price,
-                    quantity: item.quantity,
-                })),
-                total: finalTotal,
-                tax,
-                subtotal: cart.total,
-            };
+        console.log('Processing payment with card info:', paymentData);
 
-            const transaction = await processPayment(transactionData);
+        const customer = {
+            email: 'customer@example.com',  
+        };
 
-            dispatch(processPaymentSuccess(transaction));
-            dispatch(clearCart());
-            setPaymentModalVisible(false);
+        const transactionData: TransactionRequest = {
+            items: [{
+                productId: 15,
+                quantity: 2,
+            }],
+            currency: 'COP', 
+            customer, 
+        };
 
-            Toast.show({
-                type: 'success',
-                text1: 'Payment Successful! 🎉',
-                text2: `Transaction ID: ${transaction.id}`,
-            });
+        // Call the createTransaction function from the API
+        const { transactionId } = await createTransaction(transactionData);
 
-            setTimeout(() => {
-                navigation.navigate('Transaction');
-            }, 1500);
-        } catch (error: any) {
-            dispatch(processPaymentFailure(error?.message ?? 'Unknown error'));
-            Toast.show({
-                type: 'error',
-                text1: 'Payment Failed',
-                text2: error?.message ?? 'Unknown error',
-            });
-        }
-    };
+        // Pay the transaction
+        const response = await payTransaction(transactionId, {
+            type: 'CARD',
+            token: 'tok_stagtest_5113_de886523faddEa5f7C1e470e284a90C0',  
+            installments: 1,
+        });
+
+        console.log('Payment response:', response);
+
+        dispatch(processPaymentSuccess({ 
+            id: transactionId , 
+            amount:  finalTotal , 
+            currency: 'COP', 
+            cardInfo: paymentData, 
+            cardLast4: response.wompi.data.payment_method.extra.last_four, 
+            paymentMethod: {
+                cardType: response.wompi.data.payment_method.extra.card_type as any,
+                last4: response.wompi.data.payment_method.extra.last_four,
+                type: response.wompi.data.payment_method.type,
+            },
+            status: response.status,
+            timestamp: new Date().toISOString(),
+            items: cart.items.map((item) => ({
+                id: item.id,
+                name: item.product.name,
+                quantity: item.quantity,
+                price: item.product.price
+            }))
+        }));
+
+
+        dispatch(clearCart());
+        setPaymentModalVisible(false);
+
+        Toast.show({
+            type: 'success',
+            text1: 'Payment Successful! 🎉',
+            text2: `Transaction ID: ${transactionId}`,
+        });
+
+        setTimeout(() => {
+            navigation.navigate('Transaction');
+        }, 1500);
+    } catch (error: any) {
+        console.error('Payment error:', error);
+        dispatch(processPaymentFailure(error?.message ?? 'Unknown error'));
+        Toast.show({
+            type: 'error',
+            text1: 'Payment Failed',
+            text2: error?.message ?? 'Unknown error',
+        });
+    }
+};
 
     const renderCartItem: ListRenderItem<ICartItem> = ({ item }) => (
         <CartItem item={{ ...item.product, quantity: item.quantity }} />
