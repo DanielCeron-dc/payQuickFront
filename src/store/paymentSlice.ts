@@ -1,4 +1,3 @@
-// paymentSlice.ts
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { secureStore, securePaymentData, ICardInfoInput } from '../utils/encryption';
 import { ITransaction } from '../services/paymentApi';
@@ -12,10 +11,15 @@ export interface ICardInfo {
     holderName: string;
 }
 
+export interface ICustomer {
+    email: string;
+    name?: string;
+}
 
 export interface PaymentState {
     cardInfo: ICardInfo;
     cardType: ICardType;
+    customer: ICustomer | null;
     isProcessing: boolean;
     lastTransaction: ITransaction | null;
     error: unknown | null;
@@ -29,6 +33,7 @@ const initialState: PaymentState = {
         holderName: '',
     },
     cardType: '',
+    customer: null, // Initialize customer state as null
     isProcessing: false,
     lastTransaction: null,
     error: null,
@@ -44,6 +49,9 @@ const paymentSlice = createSlice({
         setCardType: (state, action: PayloadAction<ICardType>) => {
             state.cardType = action.payload;
         },
+        setCustomerInfo: (state, action: PayloadAction<ICustomer>) => {
+            state.customer = action.payload; // Update customer info
+        },
         startProcessing: (state) => {
             state.isProcessing = true;
             state.error = null;
@@ -55,13 +63,11 @@ const paymentSlice = createSlice({
             state.error = null;
 
             // Securely store transaction data
-
             const { cardInfo, ...rest } = action.payload;
-
 
             const securedTransaction = securePaymentData({
                 cardInfo: { ...cardInfo } as ICardInfoInput,
-                ...rest
+                ...rest,
             });
             secureStore('lastTransaction', securedTransaction);
         },
@@ -77,6 +83,7 @@ const paymentSlice = createSlice({
                 holderName: '',
             };
             state.cardType = '';
+            state.customer = null; // Clear customer data as well
             state.error = null;
         },
         clearTransaction: (state) => {
@@ -94,6 +101,7 @@ const paymentSlice = createSlice({
 export const {
     updateCardInfo,
     setCardType,
+    setCustomerInfo, // Added action for customer info
     startProcessing,
     processPaymentSuccess,
     processPaymentFailure,

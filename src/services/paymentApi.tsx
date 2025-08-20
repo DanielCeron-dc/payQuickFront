@@ -36,7 +36,7 @@ export interface TransactionItem {
 
 export interface ITransaction {
     id: string;
-    status: 'success';
+    status: string;
     amount: number;
     cardInfo: CardInfoInput;
     currency: 'USD' | string;
@@ -44,7 +44,7 @@ export interface ITransaction {
     timestamp: string; // ISO
     items: TransactionItem[];
     paymentMethod: {
-        type: 'credit_card';
+        type: string;
         cardType: CardType;
         last4: string;
     };
